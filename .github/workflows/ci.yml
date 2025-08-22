@@ -1,30 +1,47 @@
+name: CI - Cypress
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch: {}   # permite rodar manualmente pela aba Actions
+
 jobs:
   e2e:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        node: [18, 20]
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }}
+          node-version: "20"
           cache: "npm"
-      - run: npm ci
-      - uses: cypress-io/github-action@v6
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v6
         with:
-          command: npm run cy:run
-      - uses: actions/upload-artifact@v4
+          command: npx cypress run
+          # se preferir: command: npx cypress run --browser chrome --headless
+
+      - name: Upload videos
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-videos-${{ matrix.os }}-node${{ matrix.node }}
+          name: cypress-videos
           path: cypress/videos
           if-no-files-found: ignore
-      - uses: actions/upload-artifact@v4
+
+      - name: Upload screenshots
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: cypress-screenshots-${{ matrix.os }}-node${{ matrix.node }}
+          name: cypress-screenshots
           path: cypress/screenshots
           if-no-files-found: ignore
