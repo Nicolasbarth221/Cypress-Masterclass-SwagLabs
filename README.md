@@ -27,8 +27,7 @@ O objetivo deste repositório é demonstrar práticas profissionais de QA Engine
 ---
 
 ## 📂 Estrutura do Projeto
-```bash
-/
+
 cypress/
 ├── e2e/
 │ ├── login.spec.js # Testes de login
